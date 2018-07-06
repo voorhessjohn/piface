@@ -126,33 +126,28 @@ def upload_pic(filepath, bucket):
 
 
 
+# function that generates the mood and confidence
+# in text in the center of a box filled with the
+# color code for the respective mood using turtle
 def show_mood(mood, confidence):
+    font = ("Arial", 14, "bold")
     color = MOOD_COLORS[mood]
     t.begin_fill()
     t.pencolor('white')
-    #t.setfillopacity(confidence)
     t.hideturtle()
     t.fillcolor(color)
     t.up()
-    t.forward(100)
-    t._rotate(90)
-    t.forward(100)
+    t.goto(-100, -100)
     t.down()
-    t._rotate(90)
-    t.forward(200)
-    t._rotate(90)
-    t.forward(200)
-    t._rotate(90)
-    t.forward(200)
-    t._rotate(90)
-    t.forward(200)
-    t.up()
-    t._rotate(90)
-    t.forward(100)
-    t._rotate(90)
-    t.forward(100)
+    for i in range(4):
+        t.forward(200)
+        t._rotate(90)
     t.end_fill()
-    time.sleep(3)
+    t.up()
+    t.home()
+    t.pencolor('black')
+    t.write(mood + ': \n', align='center', font=font)
+    t.write("{0}%".format(round(confidence)), align='center', font=font)
 
 
 def parse_mood(response):
@@ -164,9 +159,78 @@ def parse_mood(response):
 names = ['courtney_sad.jpg', 'dan_happy.jpg', 'fontana.jpg', 'tim_serious.jpg']
 
 
-while logged_in:
-    conf_tup = parse_mood((detect_faces('moodrecognition', take_picture())))
-    show_mood(conf_tup[0],conf_tup[1])
-    time.sleep(2)
+# main menu
+def menu():
+
+    global count
+
+    if count == 0:
+        print('                    ___  ___  ____     ____      ____        ______')
+        print('                   /   |/   |/    /   /  _ \    /  _ \      /  _   \ ')
+        print('                  /              /   |  | | |  |  | | |    /  / /  /')
+        print('                 /    /|___/    /    |  |_| |  |  |_| |   /  /_/  /')
+        print('                /____/     /___/      \____/    \____/   /_______/')
+        print('    _____     _____  ____  ___    ____    __  ___  _____ ______ _____ ___     __  ___')
+        print('   /  __ \   / ___/ / ___// _ \  / ___\  /  |/  / /_  _//_  __//_  _// _ \   /  |/  /')
+        print('  /  /_/_/  / /_   / /   | | | || /____ /      /   / /   / /    / / | | | | /      /')
+        print(' /  /\  \  /  _/_ / /__  | |_| || |_/ //      / __/ /_  / /  __/ /_ | |_| |/      /')
+        print('/__/  \__|/_____//____/   \___/ \____//__/|__/ /_____/ /_/  /_____/  \___//__/|__/')
+        print('                    _________    ________     ___  ___  ____')
+        print('                   /__   ___/   /__  ___/    /   |/   |/    /')
+        print('                     /   /        /  /      /              /')
+        print('                  __/   /__      /  /      /    /|___/    /')
+        print('                 /________/     /__/      /____/     /___/')
+        time.sleep(5)
+    count += 1
+    os.system('cls')
+    menu_login = input('  ---Main Menu---\n\n     1: Login\n     '
+                       '2. Exit\n\n' 'Enter Input: ')
+
+    if menu_login == '1':
+        while logged_in == False:
+            try:
+                os.system('cls')
+                print('--Login--\n')
+                username = input('Username: ')
+                password = input('Password: ')
+                log_in(username, password)
+                try:
+                    while True:
+
+                        while logged_in == True:
+                            os.system('cls')
+                            print('Demo ITM currently in use...\n\n')
+                            print('Enter Cntrl-c to end session')
+                            for i in names:
+                                conf_tup = parse_mood((detect_faces('moodrecognition', i)))
+                                show_mood(conf_tup[0], conf_tup[1])
+                except KeyboardInterrupt:
+                    break
+
+            except:
+                print('\nInvalid username or password...Please try again\n\n')
+                time.sleep(3)
+
+    elif menu_login == '2':
+        sys.exit()
+
+    else:
+        print('Invalid Command. Please try again...')
+        time.sleep(3)
+        menu()
+
+
+# main
+try:
+    while True:
+        menu()
+except KeyboardInterrupt:
+    menu()
+
+
+# while logged_in:
+#     conf_tup = parse_mood((detect_faces('moodrecognition', take_picture())))
+#     show_mood(conf_tup[0],conf_tup[1])
+#     time.sleep(2)
 
 
