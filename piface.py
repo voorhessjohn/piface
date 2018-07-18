@@ -1,8 +1,13 @@
 import time
 import boto3
-#import picamera
+from picamera import PiCamera
 import turtle
 from turtle import Turtle, Screen
+import os
+import sys
+camera = PiCamera()
+camera.resolution = (640, 480)
+count = 0
 s = Screen()
 t = turtle.Turtle()
 s.setup(200, 200)
@@ -17,7 +22,7 @@ response_list = [{'FaceDetails': [{'Eyeglasses': {'Value': False, 'Confidence': 
 timestamp_list = []
 
 #-----------------------------------------------------------------
-# function: adds timestamp to response and converts a list of 
+# function: adds timestamp to response and converts a list of
 #           responses to formatted rows in csv. Uses Pandas to
 #           separate each emotion into its own row with a boolean
 #           value.
@@ -29,7 +34,7 @@ timestamp_list = []
 def write_formatted_csv_from_list_of_responses(responses_list, file_name):
     rows = []
     with open(file_name, 'w') as f:
-        i = 0     
+        i = 0
         for response in responses_list:
             for face in response['FaceDetails']:
                 face_dict = {}
@@ -81,7 +86,7 @@ def write_formatted_csv_from_list_of_responses(responses_list, file_name):
 
 
                 rows.append(face_dict)
-        i++
+        i+=1
     df = pd.DataFrame(rows)
     df.fillna(value = '0', inplace=True)
     df.to_csv(file_name)
@@ -102,7 +107,7 @@ def log_out():
 
 def take_picture():
     image = 'image' + str(time.time()) + '.jpg'
-    #camera.capture(image)
+    camera.capture(image)
     timestamp_list.append(time.time())
     return image
 
@@ -123,7 +128,7 @@ def detect_faces(bucket, name):
 def upload_pic(filepath, bucket):
     data = open(filepath, 'rb')
     s3.Bucket(bucket).put_object(Key=filepath, Body=data)
-
+    return bucket, filepath
 
 
 # function that generates the mood and confidence
@@ -156,15 +161,13 @@ def parse_mood(response):
     return mood, confidence
 
 
-names = ['courtney_sad.jpg', 'dan_happy.jpg', 'fontana.jpg', 'tim_serious.jpg']
-
-
 # main menu
 def menu():
 
     global count
 
     if count == 0:
+        os.system('clear')
         print('                    ___  ___  ____     ____      ____        ______')
         print('                   /   |/   |/    /   /  _ \    /  _ \      /  _   \ ')
         print('                  /              /   |  | | |  |  | | |    /  / /  /')
@@ -182,29 +185,34 @@ def menu():
         print('                 /________/     /__/      /____/     /___/')
         time.sleep(5)
     count += 1
-    os.system('cls')
+    os.system('clear')
     menu_login = input('  ---Main Menu---\n\n     1: Login\n     '
                        '2. Exit\n\n' 'Enter Input: ')
 
     if menu_login == '1':
         while logged_in == False:
             try:
-                os.system('cls')
+                os.system('clear')
                 print('--Login--\n')
                 username = input('Username: ')
                 password = input('Password: ')
                 log_in(username, password)
                 try:
                     while True:
-
+                    
+                        os.system('clear')
+                        print('Demo ITM currently in use...\n\n')
+                        print('Enter Cntrl-c to end session')
+                    
                         while logged_in == True:
-                            os.system('cls')
-                            print('Demo ITM currently in use...\n\n')
-                            print('Enter Cntrl-c to end session')
-                            for i in names:
-                                conf_tup = parse_mood((detect_faces('moodrecognition', i)))
-                                show_mood(conf_tup[0], conf_tup[1])
-                except KeyboardInterrupt:
+                              image = take_picture()
+                              upload = upload_pic(image, 'teamofdestinygenesis')
+                              detect = detect_faces(upload[0], upload[1])
+                              conf_tup = parse_mood(detect)
+                              show_mood(conf_tup[0],conf_tup[1])
+                            
+                except KeyboardInterrupt as k:
+                    print(k)
                     break
 
             except:
@@ -218,19 +226,13 @@ def menu():
         print('Invalid Command. Please try again...')
         time.sleep(3)
         menu()
+  
 
-
-# main
+#main
 try:
-    while True:
-        menu()
-except KeyboardInterrupt:
+  while True:
     menu()
-
-
-# while logged_in:
-#     conf_tup = parse_mood((detect_faces('moodrecognition', take_picture())))
-#     show_mood(conf_tup[0],conf_tup[1])
-#     time.sleep(2)
+except KeyboardInterrupt:
+  menu()
 
 
