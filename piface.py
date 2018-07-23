@@ -129,33 +129,7 @@ def detect_faces(bucket, name):
         Attributes=['ALL']
     )
 
-    mood = str((response['FaceDetails'][0]['Emotions'][0]['Type']))
-    mood2 = str((response['FaceDetails'][0]['Emotions'][1]['Type']))
-    mood3 = str((response['FaceDetails'][0]['Emotions'][2]['Type']))
-
-    # if mood in emotion_dict.keys():
-    #     emotion_dict[mood] += 1
-    # else:
-    #     emotion_dict[mood] = 1
-
-    confidence1 = (response['FaceDetails'][0]['Emotions'][0]['Confidence'])
-    confidence2 = (response['FaceDetails'][0]['Emotions'][1]['Confidence'])
-    confidence3 = (response['FaceDetails'][0]['Emotions'][2]['Confidence'])
-
-    if mood in conf_dict.keys():
-        conf_dict[mood] += int(confidence1)
-    else:
-        conf_dict[mood] = int(confidence1)
-
-    if mood2 in conf_dict.keys():
-        conf_dict[mood2] += int(confidence2)
-    else:
-        conf_dict[mood2] = int(confidence2)
-
-    if mood3 in conf_dict.keys():
-        conf_dict[mood3] += int(confidence3)
-    else:
-        conf_dict[mood3] = int(confidence3)
+    print("in detect_faces: response")
 
     return response
 
@@ -192,10 +166,46 @@ def show_mood(mood, confidence):
 
 def parse_mood(response):
     if not response['FaceDetails']:
+        print(response['FaceDetails'])
         return (0,0)
     else:
         mood = response['FaceDetails'][0]['Emotions'][0]['Type']
         confidence = response['FaceDetails'][0]['Emotions'][0]['Confidence']
+        
+        mood1 = str((response['FaceDetails'][0]['Emotions'][0]['Type']))
+        mood2 = str((response['FaceDetails'][0]['Emotions'][1]['Type']))
+        mood3 = str((response['FaceDetails'][0]['Emotions'][2]['Type']))
+        
+        print("in detect_faces: moods 1, 2, 3")
+    
+        # if mood in emotion_dict.keys():
+        #     emotion_dict[mood] += 1
+        # else:
+        #     emotion_dict[mood] = 1
+    
+        confidence1 = (response['FaceDetails'][0]['Emotions'][0]['Confidence'])
+        confidence2 = (response['FaceDetails'][0]['Emotions'][1]['Confidence'])
+        confidence3 = (response['FaceDetails'][0]['Emotions'][2]['Confidence'])
+        
+        print("in detect_faces: confidences 1, 2, 3")
+    
+        if mood1 in conf_dict.keys():
+            conf_dict[mood1] += int(confidence1)
+        else:
+            conf_dict[mood1] = int(confidence1)
+    
+        if mood2 in conf_dict.keys():
+            conf_dict[mood2] += int(confidence2)
+        else:
+            conf_dict[mood2] = int(confidence2)
+    
+        if mood3 in conf_dict.keys():
+            conf_dict[mood3] += int(confidence3)
+        else:
+            conf_dict[mood3] = int(confidence3)
+            
+        print("in detect_faces: after all if, else statments")
+        
     return mood, confidence
 
 
@@ -255,13 +265,17 @@ def menu():
                         while logged_in == True:
                             image = take_picture()
                             upload = upload_pic(image, 'teamofdestinygenesis')
+                            print("uploaded")
                             detect = detect_faces(upload[0], upload[1])
-                            response_list.append[detect]
+                            print("detected")
+                            response_list.append(detect)
+                            print("appended")
                             conf_tup = parse_mood(detect)
+                            print("parsed")
                             if conf_tup[0] != 0:
                                 show_mood(conf_tup[0],conf_tup[1])
                             else:
-                                pass
+                                print("no face")
                             count2 += 1
                             if count2 % 5 == 0:
                                 avg_emotion()
