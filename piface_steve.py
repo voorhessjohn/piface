@@ -1,6 +1,5 @@
 import time
 import boto3
-from picamera import PiCamera
 import turtle
 from turtle import Turtle, Screen
 import os
@@ -156,7 +155,7 @@ def insert_into_table(face_dict):
 	item = json.dumps(face_dict)
 	item = json.loads(item, parse_float=decimal.Decimal)
 	table.put_item(Item=item)
-  
+
 def log_in(username, password):
     global logged_in
     if password == USER_PASS_DICT[username]:
@@ -233,41 +232,41 @@ def parse_mood(response):
     else:
         mood = response['FaceDetails'][0]['Emotions'][0]['Type']
         confidence = response['FaceDetails'][0]['Emotions'][0]['Confidence']
-        
+
         mood1 = str((response['FaceDetails'][0]['Emotions'][0]['Type']))
         mood2 = str((response['FaceDetails'][0]['Emotions'][1]['Type']))
         mood3 = str((response['FaceDetails'][0]['Emotions'][2]['Type']))
-        
+
         print("in detect_faces: moods 1, 2, 3")
-    
+
         # if mood in emotion_dict.keys():
         #     emotion_dict[mood] += 1
         # else:
         #     emotion_dict[mood] = 1
-    
+
         confidence1 = (response['FaceDetails'][0]['Emotions'][0]['Confidence'])
         confidence2 = (response['FaceDetails'][0]['Emotions'][1]['Confidence'])
         confidence3 = (response['FaceDetails'][0]['Emotions'][2]['Confidence'])
-        
+
         print("in detect_faces: confidences 1, 2, 3")
-    
+
         if mood1 in conf_dict.keys():
             conf_dict[mood1] += int(confidence1)
         else:
             conf_dict[mood1] = int(confidence1)
-    
+
         if mood2 in conf_dict.keys():
             conf_dict[mood2] += int(confidence2)
         else:
             conf_dict[mood2] = int(confidence2)
-    
+
         if mood3 in conf_dict.keys():
             conf_dict[mood3] += int(confidence3)
         else:
             conf_dict[mood3] = int(confidence3)
-            
+
         print("in detect_faces: after all if, else statments")
-        
+
     return mood, confidence
 
 
@@ -365,5 +364,3 @@ try:
         menu()
 except KeyboardInterrupt:
     menu()
-
-
