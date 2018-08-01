@@ -102,55 +102,58 @@ def write_formatted_csv_from_list_of_responses(responses_list, file_name):
     df.to_csv(file_name)
 
 def create_dict_for_dynamo(response):
-    for face in response['FaceDetails']:
-        face_dict = {}
-        face_dict['time'] = time.time()
-        face_dict['ID'] = i
-        if face['Sunglasses']['Value'] == True:
-            face_dict['Sunglasses'] = 1
-        else:
-            face_dict['Sunglasses'] = 0
-        if face['Sunglasses']['Confidence'] > 0:
-            face_dict['Sunglasses_Confidence'] = face['Sunglasses']['Confidence']
-        else:
-            face_dict['Sunglasses_Confidence'] = 0
-        face_dict['Gender'] = face['Gender']['Value']
-        if face['Gender']['Confidence'] > 0:
-            face_dict['Gender_Confidence'] = face['Gender']['Confidence']
-        else:
-            face_dict['Gender_Confidence'] = 0
-        if face['EyesOpen']['Value'] == True:
-            face_dict['EyesOpen'] = 1
-        else:
-            face_dict['EyesOpen'] = 0
-        if face['EyesOpen']['Confidence'] > 0:
-            face_dict['EyesOpen_Confidence'] = face['EyesOpen']['Confidence']
-        else:
-            face_dict['EyesOpen_Confidence'] = 0
-        if face['Beard']['Value'] == True:
-            face_dict['Beard'] = 1
-        else:
-            face_dict['Beard'] = 0
-        if face['Beard']['Confidence'] > 0:
-            face_dict['Beard_Confidence'] = face['Beard']['Confidence']
-        else:
-            face_dict['Beard_Confidence'] = 0
-        face_dict['Pose_Pitch'] = face['Pose']['Pitch']
-        face_dict['Pose_Yaw'] = face['Pose']['Yaw']
-        face_dict['Pose_Roll'] = face['Pose']['Roll']
-        for emotion in face['Emotions']:
-            emotion_type = emotion['Type']
-            face_dict[emotion_type] = 1
-            face_dict['Confidence_'+emotion_type] = emotion['Confidence']
-        face_dict['Feelings'] = face['Emotions'][0]['Type']
-        face_dict['Emotion_1'] = face['Emotions'][0]['Type']
-        face_dict['Emotion_2'] = face['Emotions'][1]['Type']
-        face_dict['Emotion_3'] = face['Emotions'][2]['Type']
-        face_dict['Confidence_1'] = face['Emotions'][0]['Confidence']
-        face_dict['Confidence_2'] = face['Emotions'][1]['Confidence']
-        face_dict['Confidence_3'] = face['Emotions'][2]['Confidence']
-
-    return face_dict
+	default_dict = {'ID':time.time()}
+	if len(response['FaceDetails'])>=1:
+		for face in response['FaceDetails']:
+			face_dict = {}
+			face_dict['ID'] = time.time()
+			# face_dict['ID'] = i
+			if face['Sunglasses']['Value'] == True:
+			    face_dict['Sunglasses'] = 1
+			else:
+			    face_dict['Sunglasses'] = 0
+			if face['Sunglasses']['Confidence'] > 0:
+			    face_dict['Sunglasses_Confidence'] = face['Sunglasses']['Confidence']
+			else:
+			    face_dict['Sunglasses_Confidence'] = 0
+			face_dict['Gender'] = face['Gender']['Value']
+			if face['Gender']['Confidence'] > 0:
+			    face_dict['Gender_Confidence'] = face['Gender']['Confidence']
+			else:
+			    face_dict['Gender_Confidence'] = 0
+			if face['EyesOpen']['Value'] == True:
+			    face_dict['EyesOpen'] = 1
+			else:
+			    face_dict['EyesOpen'] = 0
+			if face['EyesOpen']['Confidence'] > 0:
+			    face_dict['EyesOpen_Confidence'] = face['EyesOpen']['Confidence']
+			else:
+			    face_dict['EyesOpen_Confidence'] = 0
+			if face['Beard']['Value'] == True:
+			    face_dict['Beard'] = 1
+			else:
+			    face_dict['Beard'] = 0
+			if face['Beard']['Confidence'] > 0:
+			    face_dict['Beard_Confidence'] = face['Beard']['Confidence']
+			else:
+			    face_dict['Beard_Confidence'] = 0
+			face_dict['Pose_Pitch'] = face['Pose']['Pitch']
+			face_dict['Pose_Yaw'] = face['Pose']['Yaw']
+			face_dict['Pose_Roll'] = face['Pose']['Roll']
+			for emotion in face['Emotions']:
+			    emotion_type = emotion['Type']
+			    face_dict[emotion_type] = 1
+			    face_dict['Confidence_'+emotion_type] = emotion['Confidence']
+			face_dict['Feelings'] = face['Emotions'][0]['Type']
+			face_dict['Emotion_1'] = face['Emotions'][0]['Type']
+			face_dict['Emotion_2'] = face['Emotions'][1]['Type']
+			face_dict['Emotion_3'] = face['Emotions'][2]['Type']
+			face_dict['Confidence_1'] = face['Emotions'][0]['Confidence']
+			face_dict['Confidence_2'] = face['Emotions'][1]['Confidence']
+			face_dict['Confidence_3'] = face['Emotions'][2]['Confidence']
+			return face_dict
+	else:
+		return default_dict
 
 def insert_into_table(face_dict):
 	item = json.dumps(face_dict)
